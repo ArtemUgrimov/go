@@ -8,7 +8,7 @@ func main() {
 	monkey1 := Monkey{
 		Animal: Animal{
 			Name:   "Jija",
-			IsFree: true,
+			IsFree: false,
 		},
 		JumpHeight: 25,
 	}
@@ -16,7 +16,7 @@ func main() {
 	monkey2 := Monkey{
 		Animal: Animal{
 			Name:   "Chacha",
-			IsFree: true,
+			IsFree: false,
 		},
 		JumpHeight: 20,
 	}
@@ -24,7 +24,7 @@ func main() {
 	l := Lion{
 		Animal{
 			"Ostap",
-			true,
+			false,
 		},
 		true,
 	}
@@ -32,7 +32,7 @@ func main() {
 	giraffe1 := Giraffe{
 		Animal: Animal{
 			Name:   "Nestor",
-			IsFree: true,
+			IsFree: false,
 		},
 		NeckLength: 5,
 	}
@@ -40,17 +40,17 @@ func main() {
 	giraffe2 := Giraffe{
 		Animal: Animal{
 			Name:   "Bizon",
-			IsFree: true,
+			IsFree: false,
 		},
 		NeckLength: 5,
 	}
 
+	cage1 := Cage{&monkey1.Animal}
+	cage2 := Cage{&monkey2.Animal}
+	cage3 := Cage{&l.Animal}
+	cage4 := Cage{&giraffe1.Animal}
+	cage5 := Cage{&giraffe2.Animal}
 	fmt.Println("All the animals are leaving their cages!!!")
-	cage1 := Cage{&monkey1.Animal, true}
-	cage2 := Cage{&monkey2.Animal, true}
-	cage3 := Cage{&l.Animal, true}
-	cage4 := Cage{&giraffe1.Animal, true}
-	cage5 := Cage{&giraffe2.Animal, true}
 
 	cage1.freeAnimal()
 	cage2.freeAnimal()

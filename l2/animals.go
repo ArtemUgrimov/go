@@ -2,9 +2,28 @@ package main
 
 import "fmt"
 
+type Cagable interface {
+	isFree() bool
+	free()
+	imprison()
+	whoAreYou() string
+}
+
 type Animal struct {
 	Name   string
 	IsFree bool
+}
+
+func (a *Animal) isFree() bool {
+	return a.IsFree
+}
+
+func (a *Animal) free() {
+	a.IsFree = true
+}
+
+func (a *Animal) imprison() {
+	a.IsFree = false
 }
 
 func (a *Animal) whoAreYou() string {
