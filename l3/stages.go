@@ -89,7 +89,7 @@ func stage2(player *Player, priorStage *Stage, choice int) *Stage {
 		},
 	}
 
-	stage3People := Stage{
+	stageSearch := Stage{
 		"3. Піти на пошуки резидентів лагеря",
 		strings.ReplaceAll(`{{name}} знав, що якщо найближчу годину
 не знайде допомогу, то може ніколи не побачити близьких. Аж раптом він побачив людські сліди.
@@ -101,7 +101,7 @@ func stage2(player *Player, priorStage *Stage, choice int) *Stage {
 			player.hp -= 10
 		},
 	}
-	chosenStage.decisions = []*Stage{&stageFirewood, &stageFood, &stage3People}
+	chosenStage.decisions = []*Stage{&stageFirewood, &stageFood, &stageSearch}
 
 	return chosenStage
 }
@@ -151,18 +151,14 @@ func stage4(player *Player, priorStage *Stage, choice int) *Stage {
 			"1. Продовжити...",
 			fmt.Sprintf("Віддавши усі сили богам, %s кричав так, що навколишні птахи порозліталися по лісу. Він і сам здивувався тому, на скільки голосно він кликав на допомогу. Це та мерехтіння ліхтарика дало плоди,  його знайшли резиденти лагерю. Виявилося, що один з них досвідчений лікар. Він надав потерпілому першу допомогу і зрозумів, що той - непоганий піддослідний для його дисертації, адже має якусь напрочуд дивну будову м'язів.", player.name),
 			nil,
-			func(player *Player) {
-
-			},
+			nil,
 		}
 	case 2: //спить
 		final = &Stage{
 			"1. Продовжити...",
 			strings.ReplaceAll("{{name}} раптово прокинувся від тріскоту гілок. Розплющивши очі, він побачив трьох людей. \"Ну що ж... Вечеря прийшла до нас сама...\". {{name}} відчув, що пахне смаженим, але додаткові сили дозволили йому відштовхнути цікавих гостей, а раптово гострий нюх - вибратися до найближчого міста.", "{{name}}", player.name),
 			nil,
-			func(player *Player) {
-
-			},
+			nil,
 		}
 	}
 	chosenStage.decisions = []*Stage{final}
