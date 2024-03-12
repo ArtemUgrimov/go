@@ -6,6 +6,7 @@ type Stage struct {
 	promptDescription string
 	enterDescription  string
 	decisions         []*Stage
+	effect            func(player *Player)
 }
 
 type Player struct {
@@ -15,6 +16,12 @@ type Player struct {
 	isBleeding    bool
 	extraStrength int
 	warmth        int
+}
+
+func NewPlayer() *Player {
+	player := Player{}
+	player.spawn()
+	return &player
 }
 
 func (player *Player) spawn() {
@@ -41,7 +48,6 @@ func (player *Player) updateState() {
 
 func (player *Player) printState() {
 	if player.stage != nil {
-		fmt.Println(player.stage.enterDescription)
 		if player.hp < 50 {
 			fmt.Printf("%s відчуває різкий біль по всьому тілу, рана від укусу дається взнаки, а в очах періодично темніє\n", player.name)
 		}
@@ -50,7 +56,7 @@ func (player *Player) printState() {
 		}
 		if player.extraStrength > 30 && player.extraStrength < 70 {
 			fmt.Printf("%s відчуває незрозумілий прилив сил, гілки в лісі стали майже пір'ям, а бігати вдається удвічі швидше\n", player.name)
-		} else if player.extraStrength > 70 {
+		} else if player.extraStrength >= 70 {
 			fmt.Printf("%s може наздогнати будь-яку тварину в лісі, а стрибнути так, що іноді влається спіймати птаха\n", player.name)
 		}
 		if player.warmth < 50 {
@@ -61,7 +67,11 @@ func (player *Player) printState() {
 	}
 }
 
-func (stage *Stage) prompt(player *Player) (res int) {
+func (stage *Stage) action(player *Player) (res int) {
+	if stage.effect != nil {
+		stage.effect(player)
+	}
+	player.stage = stage
 	fmt.Println(stage.enterDescription)
 
 	var valuesCount int = 0
