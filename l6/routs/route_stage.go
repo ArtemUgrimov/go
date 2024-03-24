@@ -1,9 +1,9 @@
 package routs
 
-import "main/l6/interfaces"
+import "main/l6/transports"
 
 type RouteStage struct {
-	TransportType interfaces.PublicTransport
-	Distance      int32
-	Direction     string
+	Transport transports.PublicTransport
+	Distance  int32
+	Direction string
 }

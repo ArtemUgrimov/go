@@ -1,4 +1,4 @@
-package interfaces
+package transports
 
 import (
 	"main/l6/passengers"

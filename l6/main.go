@@ -9,19 +9,19 @@ import (
 func main() {
 	route := routs.Route{}
 	route.AddTransport(routs.RouteStage{
-		TransportType: &transports.Bus{},
-		Distance:      100,
-		Direction:     "West",
+		Transport: &transports.Bus{},
+		Distance:  100,
+		Direction: "West",
 	})
 	route.AddTransport(routs.RouteStage{
-		TransportType: &transports.Airplane{},
-		Distance:      2300,
-		Direction:     "East-North",
+		Transport: &transports.Airplane{},
+		Distance:  2300,
+		Direction: "East-North",
 	})
 	route.AddTransport(routs.RouteStage{
-		TransportType: &transports.Train{},
-		Distance:      200,
-		Direction:     "South",
+		Transport: &transports.Train{},
+		Distance:  200,
+		Direction: "South",
 	})
 
 	artem := passengers.Passenger{

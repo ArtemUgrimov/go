@@ -22,11 +22,11 @@ func (r *Route) Navigate(pass *passengers.Passenger) {
 		return
 	}
 	for index, stage := range r.stages {
-		fmt.Printf("Go to the %s by a the %s", stage.Direction, stage.TransportType.ToString())
-		stage.TransportType.PickUpPassenger(pass)
+		fmt.Printf("Go to the %s by a the %s", stage.Direction, stage.Transport.ToString())
+		stage.Transport.PickUpPassenger(pass)
 		if index < len(r.stages)-1 {
 			fmt.Println(" and then...")
-			stage.TransportType.DropPassenger()
+			stage.Transport.DropPassenger()
 		} else {
 			fmt.Println(" and you are at the destination")
 		}
