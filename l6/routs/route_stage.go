@@ -1,9 +1,7 @@
 package routs
 
-import "main/l6/transports"
-
 type RouteStage struct {
-	Transport transports.PublicTransport
+	Transport PublicTransport
 	Distance  int32
 	Direction string
 }

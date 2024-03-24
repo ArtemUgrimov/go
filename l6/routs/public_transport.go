@@ -1,4 +1,4 @@
-package transports
+package routs
 
 import (
 	"main/l6/passengers"
