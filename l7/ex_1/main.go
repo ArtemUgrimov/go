@@ -12,7 +12,7 @@ func generator(ch chan int) {
 	close(ch)
 }
 
-func avg(input <-chan int, output chan int) {
+func avg(input <-chan int, output chan float64) {
 	sum := 0
 	count := 0
 	for val := range input {
@@ -20,7 +20,7 @@ func avg(input <-chan int, output chan int) {
 		count++
 	}
 	if count > 0 {
-		output <- (sum / count)
+		output <- (float64(sum) / float64(count))
 	} else {
 		output <- 0
 	}
@@ -28,17 +28,16 @@ func avg(input <-chan int, output chan int) {
 	close(output)
 }
 
-func printer(input <-chan int, ready chan bool) {
+func printer(input <-chan float64, ready chan bool) {
 	for val := range input {
 		fmt.Println("Average is", val)
 	}
 	ready <- true
-	close(ready)
 }
 
 func main() {
 	randoms := make(chan int)
-	average := make(chan int)
+	average := make(chan float64)
 	wait := make(chan bool)
 	go generator(randoms)
 	go avg(randoms, average)

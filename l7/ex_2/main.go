@@ -6,7 +6,12 @@ import (
 	"math/rand"
 )
 
-func generator(destination chan int, randeStart int, rangeEnd int, minMax <-chan int, ready chan bool) {
+type MinMax struct {
+	Min int
+	Max int
+}
+
+func generator(destination chan int, randeStart int, rangeEnd int, minMax <-chan MinMax, ready chan bool) {
 	for i := 0; i < 10; i++ {
 		val := randeStart + rand.Intn(rangeEnd-randeStart+1)
 		fmt.Println("Generated -> ", val)
@@ -14,14 +19,12 @@ func generator(destination chan int, randeStart int, rangeEnd int, minMax <-chan
 	}
 	close(destination)
 
-	min := <-minMax
-	max := <-minMax
-	fmt.Println("Min =", min, "max =", max)
+	mm := <-minMax
+	fmt.Println("Min =", mm.Min, "max =", mm.Max)
 	ready <- true
-	close(ready)
 }
 
-func minMaxFinder(source <-chan int, destination chan int) {
+func minMaxFinder(source <-chan int, destination chan MinMax) {
 	min := math.MaxInt32
 	max := math.MinInt32
 	for num := range source {
@@ -32,14 +35,19 @@ func minMaxFinder(source <-chan int, destination chan int) {
 			min = num
 		}
 	}
-	destination <- min
-	destination <- max
+
+	mm := MinMax{
+		Min: min,
+		Max: max,
+	}
+
+	destination <- mm
 	close(destination)
 }
 
 func main() {
 	randoms := make(chan int)
-	minMax := make(chan int)
+	minMax := make(chan MinMax)
 	wait := make(chan bool)
 	go generator(randoms, -10, 10, minMax, wait)
 	go minMaxFinder(randoms, minMax)
