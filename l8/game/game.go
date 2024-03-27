@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"main/l8/player"
 	"main/l8/quiz"
 	"os"
 	"time"
@@ -27,16 +26,8 @@ func NewGame(rulesFile string) *Game {
 	return g
 }
 
-func (game *Game) GameRunner(players map[string]*player.Player, parentCtx context.Context, gameOverHandle context.CancelFunc) {
-	// dirty hack to pass an array of objects that implement interface
-	var playerInterfaces map[string]IPlayer = map[string]IPlayer{}
-	for k, v := range players {
-		playerInterfaces[k] = v
-	}
-
-	fmt.Println("")
-	//===============
-
+func (game *Game) GameRunner(players map[string]IPlayer, parentCtx context.Context, gameOverHandle context.CancelFunc) {
+	fmt.Printf("Lets play %s\n", game.Name)
 	for {
 		nextRound := game.Next()
 		if nextRound == nil {
@@ -44,6 +35,8 @@ func (game *Game) GameRunner(players map[string]*player.Player, parentCtx contex
 			gameOverHandle()
 			break
 		}
+		game.currentRound++
+		fmt.Printf("===> Round %d : <===\n", game.currentRound)
 
 		questions := make(chan *quiz.Question, len(players))
 		answersCollector := make(chan *quiz.Answer, len(players))
@@ -53,13 +46,15 @@ func (game *Game) GameRunner(players map[string]*player.Player, parentCtx contex
 		}
 
 		go nextRound.Run(questions, len(players))
-		nextRound.Check(answersCollector, playerInterfaces)
 
-		fmt.Println("Correct answer was", nextRound.RightAnswer, ",-", nextRound.Question.Options[nextRound.RightAnswer])
+		var done chan bool = make(chan bool)
+		go nextRound.Check(answersCollector, players, done)
 
 		ctx, cancel := context.WithTimeout(parentCtx, time.Duration(time.Second*10))
 		defer cancel()
 		select {
+		case <-done:
+			fmt.Println("Correct answer was", nextRound.RightAnswer, ",-", nextRound.Question.Options[nextRound.RightAnswer])
 		case <-ctx.Done():
 			continue
 		case <-parentCtx.Done():
@@ -67,6 +62,10 @@ func (game *Game) GameRunner(players map[string]*player.Player, parentCtx contex
 			return
 		}
 	}
+}
+
+func (g *Game) runCycle(players map[string]IPlayer) {
+
 }
 
 func (g *Game) Next() *Round {

@@ -13,6 +13,8 @@ type Round struct {
 type IPlayer interface {
 	Play(question chan *quiz.Question, answer chan *quiz.Answer)
 	AddScore()
+	GetName() string
+	GetScore() int
 }
 
 func NewRound(question string, answers []string, rightAnswer int) *Round {
@@ -26,7 +28,6 @@ func NewRound(question string, answers []string, rightAnswer int) *Round {
 }
 
 func (r *Round) Run(questions chan *quiz.Question, amount int) {
-	fmt.Println("===> Running a round : <===")
 	fmt.Println("  ", r.Question.Text)
 	for idx, opt := range r.Question.Options {
 		fmt.Println("     ", idx, opt)
@@ -37,11 +38,12 @@ func (r *Round) Run(questions chan *quiz.Question, amount int) {
 	}
 }
 
-func (r *Round) Check(answers chan *quiz.Answer, players map[string]IPlayer) {
+func (r *Round) Check(answers chan *quiz.Answer, players map[string]IPlayer, done chan bool) {
 	for i := 0; i < len(players); i++ {
 		answer := <-answers
 		if r.RightAnswer == answer.SelectedOption {
 			players[answer.Caller].AddScore()
 		}
 	}
+	done <- true
 }

@@ -41,6 +41,14 @@ func (p *Player) Play(ask chan *quiz.Question, answer chan *quiz.Answer) {
 	}
 }
 
+func (p *Player) GetName() string {
+	return p.Name
+}
+
+func (p *Player) GetScore() int {
+	return p.Score
+}
+
 func randomEmoji() string {
 	// http://apps.timwhitlock.info/emoji/tables/unicode
 	emoji := [][]int{

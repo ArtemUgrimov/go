@@ -13,7 +13,7 @@ import (
 
 func main() {
 	playersCount := 5
-	players := make(map[string]*player.Player)
+	players := make(map[string]game.IPlayer)
 	for i := 0; i < playersCount; i++ {
 		p := player.NewPlayer()
 		players[p.Name] = p
@@ -35,15 +35,15 @@ func main() {
 	}
 
 	winner := getWinner(players)
-	fmt.Printf("👑👑👑The winner is %s with the score of %d! Congratulations!👑👑👑\n\n", winner.Name, winner.Score)
+	fmt.Printf("👑👑👑The winner is %s with the score of %d! Congratulations!👑👑👑\n\n", winner.GetName(), winner.GetScore())
 
 	fmt.Println("Playground is closed")
 }
 
-func getWinner(players map[string]*player.Player) *player.Player {
-	var winner *player.Player = nil
+func getWinner(players map[string]game.IPlayer) game.IPlayer {
+	var winner game.IPlayer = nil
 	for _, p := range players {
-		if winner == nil || p.Score > winner.Score {
+		if winner == nil || p.GetScore() > winner.GetScore() {
 			winner = p
 		}
 	}
