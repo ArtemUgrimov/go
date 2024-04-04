@@ -1,12 +1,10 @@
 package game
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"main/l8/quiz"
 	"os"
-	"time"
 )
 
 type Game struct {
@@ -26,7 +24,7 @@ func NewGame(rulesFile string) *Game {
 	return g
 }
 
-func (game *Game) GameRunner(ctx context.Context, players map[string]IPlayer, gameOverHandle chan bool) {
+func (game *Game) GameRunner(players map[string]IPlayer, gameOverHandle chan bool) {
 	fmt.Printf("Lets play %s\n", game.Name)
 	for {
 		nextRound := game.NextRound()
@@ -36,11 +34,11 @@ func (game *Game) GameRunner(ctx context.Context, players map[string]IPlayer, ga
 			break
 		}
 
-		game.PlayRound(ctx, nextRound, players)
+		game.PlayRound(nextRound, players)
 	}
 }
 
-func (game *Game) PlayRound(ctx context.Context, round *Round, players map[string]IPlayer) {
+func (game *Game) PlayRound(round *Round, players map[string]IPlayer) {
 	game.currentRound++
 	fmt.Printf("===> Round %d : <===\n", game.currentRound)
 
@@ -55,18 +53,8 @@ func (game *Game) PlayRound(ctx context.Context, round *Round, players map[strin
 
 	var roundDone chan bool = make(chan bool)
 	go round.Check(answersCollector, players, roundDone)
-
-	currentCtx, cancel := context.WithTimeout(ctx, time.Duration(time.Second*10))
-	defer cancel()
-	select {
-	case <-roundDone:
-		fmt.Println("Correct answer was", round.RightAnswer, ",-", round.Question.Options[round.RightAnswer])
-	case <-currentCtx.Done():
-		return
-	case <-ctx.Done():
-		fmt.Println("We want to play but the game is over(")
-		return
-	}
+	<-roundDone
+	fmt.Println("Correct answer was", round.RightAnswer, ",-", round.Question.Options[round.RightAnswer])
 }
 
 func (g *Game) NextRound() *Round {

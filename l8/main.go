@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"main/l8/game"
 	"main/l8/player"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func main() {
@@ -19,21 +17,16 @@ func main() {
 		players[p.Name] = p
 	}
 
-	mainCtx, cancelFunc := context.WithTimeout(context.Background(), time.Duration(time.Second*100))
-	defer cancelFunc()
-
 	gameOverHandle := make(chan bool)
 	game := game.NewGame("game.json")
-	go game.GameRunner(mainCtx, players, gameOverHandle)
+	go game.GameRunner(players, gameOverHandle)
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	select {
 	case <-gameOverHandle:
-	case <-mainCtx.Done():
 	case <-sigs:
-		cancelFunc()
 	}
 
 	winner := getWinner(players)
