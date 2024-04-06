@@ -10,8 +10,8 @@ import (
 func main() {
 	school := school.EstablishSchool()
 	http.HandleFunc("/", school.RootHandler)
-	http.HandleFunc("/students", school.StudentPickerHandler)
-	http.HandleFunc("/student/", school.GetStudentHandler)
+	http.HandleFunc("/students", school.Authorize(school.StudentPickerHandler, "/"))
+	http.HandleFunc("GET /student/{id}", school.Authorize(school.GetStudentHandler, "/students"))
 
 	http.ListenAndServe(":8000", nil)
 }

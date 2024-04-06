@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -73,7 +71,7 @@ func (school *School) RootHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(http.StatusNotAcceptable)
 }
 
 func (school *School) StudentPickerHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,36 +90,36 @@ func (school *School) StudentPickerHandler(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func (school *School) GetStudentHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	autorized := false
-	for _, t := range school.teachers {
-		if t.token == cookie.Value {
-			autorized = true
-			break
+func (school *School) Authorize(next http.HandlerFunc, redirectPath string) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
-	}
-	if !autorized {
-		http.Redirect(w, r, "/students", http.StatusSeeOther)
-		return
-	}
+		autorized := false
+		for _, t := range school.teachers {
+			if t.token == cookie.Value {
+				autorized = true
+				break
+			}
+		}
+		if !autorized {
+			http.Redirect(w, r, redirectPath, http.StatusSeeOther)
+			return
+		}
 
-	studentReg := regexp.MustCompile(`/student/[0-9]+$`)
-	if !studentReg.MatchString(r.URL.Path) {
-		w.WriteHeader(http.StatusBadRequest)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (school *School) GetStudentHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "Cannot parse ID", http.StatusBadRequest)
 		return
 	}
-	studentId, found := strings.CutPrefix(r.URL.Path, "/student/")
-	id, err := strconv.Atoi(studentId)
-	if found && err == nil {
+	if err == nil {
 		student, ok := school.GetStudent(id)
 		if ok {
 			res, err := json.Marshal(student)
