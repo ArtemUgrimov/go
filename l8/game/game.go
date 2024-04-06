@@ -1,6 +1,7 @@
 package game
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"main/l8/quiz"
@@ -11,6 +12,7 @@ type Game struct {
 	currentRound int
 	Name         string   `json:"GameName"`
 	Rounds       []*Round `json:"Rounds"`
+	gameOver     bool
 }
 
 func NewGame(rulesFile string) *Game {
@@ -24,18 +26,23 @@ func NewGame(rulesFile string) *Game {
 	return g
 }
 
-func (game *Game) GameRunner(players map[string]IPlayer, gameOverHandle chan bool) {
+func (game *Game) GameRunner(ctx context.Context, players map[string]IPlayer, gameOverHandle chan bool) {
 	fmt.Printf("Lets play %s\n", game.Name)
+	go game.CheckForEnd(ctx)
 	for {
 		nextRound := game.NextRound()
 		if nextRound == nil {
-			fmt.Println("Game over")
-			gameOverHandle <- true
 			break
 		}
 
 		game.PlayRound(nextRound, players)
+
+		if game.gameOver {
+			break
+		}
 	}
+	fmt.Println("Game os iver")
+	gameOverHandle <- true
 }
 
 func (game *Game) PlayRound(round *Round, players map[string]IPlayer) {
@@ -63,4 +70,9 @@ func (g *Game) NextRound() *Round {
 		return g.Rounds[g.currentRound-1]
 	}
 	return nil
+}
+
+func (g *Game) CheckForEnd(ctx context.Context) {
+	<-ctx.Done()
+	g.gameOver = true
 }
