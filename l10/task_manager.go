@@ -13,7 +13,11 @@ type TaskManager struct {
 
 func (tm *TaskManager) getTasks(w http.ResponseWriter, r *http.Request) {
 	if len(tm.tasks) > 0 {
-		json.NewEncoder(w).Encode(tm.tasks)
+		res := make([]Task, 0, len(tm.tasks))
+		for _, t := range tm.tasks {
+			res = append(res, t)
+		}
+		json.NewEncoder(w).Encode(res)
 	} else {
 		w.Write([]byte("{}"))
 	}
