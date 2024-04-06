@@ -12,8 +12,6 @@ type TaskManager struct {
 }
 
 func (tm *TaskManager) getTasks(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-
 	if len(tm.tasks) > 0 {
 		json.NewEncoder(w).Encode(tm.tasks)
 	} else {
@@ -38,7 +36,6 @@ func (tm *TaskManager) getTaskByID(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, error.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
 
@@ -55,7 +52,6 @@ func (tm *TaskManager) delTaskByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	delete(tm.tasks, id)
-	w.WriteHeader(http.StatusOK)
 }
 
 func (tm *TaskManager) putTaskByID(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +88,6 @@ func (tm *TaskManager) putTaskByID(w http.ResponseWriter, r *http.Request) {
 		HttpError(w, error.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
 
