@@ -13,6 +13,7 @@ func task1() {
 	if error != nil {
 		fmt.Print(error)
 	}
+	defer file.Close()
 	reader := bufio.NewReader(file)
 	telNumbers := make([]string, 0)
 	for {
@@ -44,6 +45,7 @@ func task2() {
 	if error != nil {
 		fmt.Print(error)
 	}
+	defer file.Close()
 	reader := bufio.NewReader(file)
 	contentBytes := make([]byte, 2048)
 	_, error = reader.Read(contentBytes)
@@ -54,6 +56,8 @@ func task2() {
 	content := string(contentBytes)
 
 	findPatterns := []*regexp.Regexp{
+		regexp.MustCompile(`[йцкнгшщзхфвпрлджчмтбЙЦКНГШЩЗХФВПРЛДЖЧМТБ]\S*[йцкнгшщзхфвпрлджчмтб][^ ,.]*`),
+		regexp.MustCompile(``),
 		regexp.MustCompile(``),
 	}
 	for _, pattern := range findPatterns {
@@ -63,6 +67,6 @@ func task2() {
 }
 
 func main() {
-	// task1()
+	task1()
 	task2()
 }
