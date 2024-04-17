@@ -1,0 +1,5 @@
+github.com/ArtemUgrimov/findutils v0.0.0-20240417045738-eaee3bca15bb h1:q7vXKjFp5hu/jRoijVQykH4yR3XcRX8j61U7xjcU40g=
+github.com/ArtemUgrimov/findutils v0.0.0-20240417045738-eaee3bca15bb/go.mod h1:xPesKc5Z5UoMx0ouu6dVWiDX9Li7aQOuLg/RhC5yr1A=
+github.com/ArtemUgrimov/go_package v0.0.0-20240417045738-eaee3bca15bb h1:ScD02hYZes2qkzCSQ0c3ddgspXlM8QYkgZJSyIFEs80=
+github.com/ArtemUgrimov/go_package v0.0.0-20240417045738-eaee3bca15bb/go.mod h1:y7z5XapCW8WQ41x1wG5PMrkC9rq4staCJycnWbD9kr8=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
