@@ -4,6 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"main/internal/passwords"
+	"os"
+)
+
+const (
+	cmdExit = 0
+	cmdList = 1
+	cmdSave = 2
+	cmdGet  = 3
 )
 
 func printMenu() {
@@ -15,7 +23,11 @@ func printMenu() {
 }
 
 func App() {
-	manager := passwords.NewManager()
+	manager, err := passwords.NewManager()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	for {
 		printMenu()
 		var option int
@@ -23,21 +35,19 @@ func App() {
 		if err != nil {
 			continue
 		}
-		if option == 0 {
+		if option == cmdExit {
 			fmt.Println("Bye")
 			break
 		}
 		switch option {
-		// list passwords
-		case 1:
+		case cmdList:
 			bytes, err := json.Marshal(manager)
 			if err != nil {
 				fmt.Println(err)
 				break
 			}
 			fmt.Println(string(bytes))
-		// save password
-		case 2:
+		case cmdSave:
 			var name, pass string
 			args, err := fmt.Scan(&name, &pass)
 			if args < 2 {
@@ -50,8 +60,7 @@ func App() {
 			}
 			manager.Add(name, pass)
 			fmt.Println("Ok")
-		// get password
-		case 3:
+		case cmdGet:
 			var name string
 			_, err := fmt.Scan(&name)
 			if err != nil {
@@ -69,5 +78,8 @@ func App() {
 		}
 		fmt.Print("==========\n\n")
 	}
-	manager.Save()
+	err = manager.Save()
+	if err != nil {
+		fmt.Println(err)
+	}
 }

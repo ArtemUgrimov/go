@@ -2,6 +2,7 @@ package passwords
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -14,31 +15,30 @@ type PasswordManager struct {
 	Passwords map[string]string `json:"Passwords"`
 }
 
-func NewManager() *PasswordManager {
+func NewManager() (*PasswordManager, error) {
 	manager := &PasswordManager{}
 	manager.Passwords = make(map[string]string)
 
 	wd, _ := os.Getwd()
 	file, err := os.ReadFile(wd + passFileName)
 	if err != nil {
-		fmt.Println(err.Error())
-		return manager
+		return nil, errors.New("cannot parse password manager file")
 	}
 	json.Unmarshal(file, manager)
-	return manager
+	return manager, nil
 }
 
-func (m *PasswordManager) Save() {
+func (m *PasswordManager) Save() error {
 	bytes, err := json.Marshal(m)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	wd, _ := os.Getwd()
 	err = os.WriteFile(wd+passFileName, bytes, 0644)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
+	return nil
 }
 
 func (m *PasswordManager) Add(name, pass string) {
