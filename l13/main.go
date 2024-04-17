@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	findutils "github.com/ArtemUgrimov/findutils/pkg"
+	"github.com/ArtemUgrimov/findutils"
 )
 
 func main() {
