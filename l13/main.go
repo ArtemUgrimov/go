@@ -7,5 +7,10 @@ import (
 )
 
 func main() {
-	fmt.Println(findutils.FindNumbersInFile("numbers.txt"))
+	result, error := findutils.FindNumbersInFile("numbers.txt")
+	if error != nil {
+		fmt.Println(error)
+	} else {
+		fmt.Println(result)
+	}
 }
