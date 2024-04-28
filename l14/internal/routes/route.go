@@ -45,6 +45,9 @@ func (r *Route) Start() error {
 func (r *Route) Next() error {
 	if r.NextDestination != len(r.Points) || r.Status != InProgress {
 		r.NextDestination++
+		if r.NextDestination == len(r.Points) {
+			r.Status = Finished
+		}
 		return nil
 	} else {
 		return errors.New("cannot proceed to the next point")
@@ -52,5 +55,5 @@ func (r *Route) Next() error {
 }
 
 func (r *Route) IsFinished() bool {
-	return r.NextDestination == len(r.Points)
+	return r.Status == Finished
 }
