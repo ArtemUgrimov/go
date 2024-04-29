@@ -43,7 +43,7 @@ func (r *Route) Start() error {
 }
 
 func (r *Route) Next() error {
-	if r.NextDestination != len(r.Points) || r.Status != InProgress {
+	if r.NextDestination < len(r.Points) || r.Status == InProgress {
 		r.NextDestination++
 		if r.NextDestination == len(r.Points) {
 			r.Status = Finished

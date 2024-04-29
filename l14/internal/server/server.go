@@ -53,6 +53,9 @@ func (a *Server) handlePostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := users.FromRequest(userReq)
+	if a.Users == nil {
+		a.Users = make(map[int64]users.User)
+	}
 	a.Users[user.Id] = user
 	w.Write([]byte(`{"status":"ok"}`))
 }
