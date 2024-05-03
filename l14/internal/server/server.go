@@ -12,23 +12,23 @@ import (
 )
 
 type Server struct {
-	Users map[int64]users.User
+	Users map[int64]*users.User
 }
 
-func (a *Server) GetRouter() *http.ServeMux {
+func (s *Server) GetRouter() *http.ServeMux {
 	router := http.NewServeMux()
 
 	// presentation layer
-	router.HandleFunc("GET /user/{id}/routes", a.handleGetRoutes)  // get user's routes
-	router.HandleFunc("POST /user/{id}/routes", a.handlePostRoute) // create route
-	router.HandleFunc("PUT /user/{id}/routes", a.handlePutRoute)   // start or continue the route route
-	router.HandleFunc("POST /user", a.handlePostUser)              // register a user
+	router.HandleFunc("GET /user/{id}/routes", s.handleGetRoutes)           // get user's routes
+	router.HandleFunc("POST /user/{id}/routes", s.handlePostRoute)          // create route
+	router.HandleFunc("POST /user/{id}/routes/next", s.handlePostRouteNext) // start or continue the route route
+	router.HandleFunc("POST /user", s.handlePostUser)                       // register a user
 
 	return router
 }
 
-func (a *Server) handleGetRoutes(w http.ResponseWriter, r *http.Request) {
-	user, err := a.readUser(r)
+func (s *Server) handleGetRoutes(w http.ResponseWriter, r *http.Request) {
+	user, err := s.readUser(r)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err.Error())
 		return
@@ -40,34 +40,34 @@ func (a *Server) handleGetRoutes(w http.ResponseWriter, r *http.Request) {
 	w.Write(routes)
 }
 
-func (a *Server) handlePostUser(w http.ResponseWriter, r *http.Request) {
-	bodyBytes, err := a.readBody(r)
+func (s *Server) handlePostUser(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, err := s.readBody(r)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	userReq := users.UserCreationRequest{}
+	userReq := UserCreationRequest{}
 	err = json.Unmarshal(bodyBytes, &userReq)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("Body marshalling error: %v", err))
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("Body unmarshalling error: %v", err))
 		return
 	}
-	user := users.FromRequest(userReq)
-	if a.Users == nil {
-		a.Users = make(map[int64]users.User)
+	user := users.NewUser(userReq.Nickname)
+	if s.Users == nil {
+		s.Users = make(map[int64]*users.User)
 	}
-	a.Users[user.Id] = user
-	w.Write([]byte(`{"status":"ok"}`))
+	s.Users[user.Id] = &user
+	w.Write([]byte(fmt.Sprintf(`{"status":"ok", "id": %d}`, user.Id)))
 }
 
-func (a *Server) handlePostRoute(w http.ResponseWriter, r *http.Request) {
-	bodyBytes, err := a.readBody(r)
+func (s *Server) handlePostRoute(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, err := s.readBody(r)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	user, err := a.readUser(r)
+	user, err := s.readUser(r)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err.Error())
 		return
@@ -76,10 +76,10 @@ func (a *Server) handlePostRoute(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusBadRequest, "user already has some routes")
 		return
 	}
-	rr := routes.RouteRequest{}
+	rr := RouteRequest{}
 	err = json.Unmarshal(bodyBytes, &rr)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, fmt.Sprintf("Body marshalling error: %v", err))
+		sendError(w, http.StatusBadRequest, fmt.Sprintf("Body unmarshalling error: %v", err))
 		return
 	}
 	route := routes.NewRoute(rr.Start, rr.Finish)
@@ -87,8 +87,8 @@ func (a *Server) handlePostRoute(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"status":"ok"}`))
 }
 
-func (a *Server) handlePutRoute(w http.ResponseWriter, r *http.Request) {
-	user, err := a.readUser(r)
+func (s *Server) handlePostRouteNext(w http.ResponseWriter, r *http.Request) {
+	user, err := s.readUser(r)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err.Error())
 		return
@@ -115,7 +115,7 @@ func (a *Server) handlePutRoute(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Server) readBody(r *http.Request) ([]byte, error) {
+func (s *Server) readBody(r *http.Request) ([]byte, error) {
 	if r.Body == nil {
 		return nil, errors.New("no body in request")
 	}
@@ -127,17 +127,17 @@ func (a *Server) readBody(r *http.Request) ([]byte, error) {
 	return bodyBytes, nil
 }
 
-func (a *Server) readUser(r *http.Request) (*users.User, error) {
+func (s *Server) readUser(r *http.Request) (*users.User, error) {
 	userIdStr := r.PathValue("id")
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 	if err != nil {
-		return nil, errors.New("cannot parse user id")
+		return nil, fmt.Errorf("cannot parse user id: %w", err)
 	}
-	user, ok := a.Users[userId]
+	user, ok := s.Users[userId]
 	if !ok {
 		return nil, errors.New("cannot find user")
 	}
-	return &user, nil
+	return user, nil
 }
 
 func sendError(w http.ResponseWriter, status int, text string) {

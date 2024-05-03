@@ -11,10 +11,10 @@ type User struct {
 	Routes   []routes.Route
 }
 
-func FromRequest(ur UserCreationRequest) User {
+func NewUser(nickname string) User {
 	user := User{
 		Id:       rand.Int63(),
-		Nickname: ur.Nickname,
+		Nickname: nickname,
 	}
 	user.Routes = make([]routes.Route, 0)
 	return user
