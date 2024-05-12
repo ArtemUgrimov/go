@@ -60,21 +60,12 @@ func NewConsumer() {
 			}
 
 			lock.Lock()
-			for {
-				_, ok := fruits[fruit.Name]
-				if ok {
-					n, ok := fruits[fruit.Name][category]
-					if ok {
-						fruits[fruit.Name][category] = n + 1
-					} else {
-						fruits[fruit.Name][category] = 1
-					}
-					break
-				} else {
-					// some kind of recursion
-					fruits[fruit.Name] = make(map[string]int32)
-				}
+			_, ok := fruits[fruit.Name]
+			if !ok {
+				fruits[fruit.Name] = make(map[string]int32)
 			}
+
+			fruits[fruit.Name][category] += 1
 			lock.Unlock()
 		}
 	}()
