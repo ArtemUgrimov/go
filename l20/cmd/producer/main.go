@@ -27,7 +27,9 @@ func NewProducer() {
 	)
 	utils.FailOnError(err, "Failed to declare a queue")
 
-	for {
+	ticker := time.NewTicker(time.Second)
+	for range ticker.C {
+
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 		name, size := utils.GetRandomFruit()
@@ -54,8 +56,6 @@ func NewProducer() {
 		log.Printf("Sent %s\n", body)
 
 		cancel()
-
-		time.Sleep(time.Second)
 	}
 }
 

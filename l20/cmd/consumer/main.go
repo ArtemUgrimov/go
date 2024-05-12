@@ -71,14 +71,14 @@ func NewConsumer() {
 	}()
 
 	go func() {
-		for {
+		ticker := time.NewTicker(time.Second * 10)
+		for range ticker.C {
 			lock.RLock()
 			for k, v := range fruits {
 				log.Printf("%s: %s:%d, %s: %d, %s: %d\n", k, utils.SMALL, v[utils.SMALL], utils.MEDIUM, v[utils.MEDIUM], utils.LARGE, v[utils.LARGE])
 			}
 			log.Printf("==============\n\n")
 			lock.RUnlock()
-			time.Sleep(time.Second * 10)
 		}
 	}()
 
